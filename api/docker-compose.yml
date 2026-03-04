@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: chess
+      RABBITMQ_DEFAULT_PASS: chess123
+
+  api:
+    build: .
+    container_name: chess-api
+    ports:
+      - "5000:8080"
+    depends_on:
+      - rabbitmq
+    environment:
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__User: chess
+      RabbitMQ__Password: chess123
