@@ -1,3 +1,4 @@
+using System.Globalization;
 using Amazon.DynamoDBv2.Model;
 
 namespace ChessGG.Infrastructure;
@@ -53,7 +54,7 @@ public class DynamoDBRequestService(DynamoDBClient client) : IRequestService
             return null;
         
         var creation = DateTime.Parse(item["Creation"].S, 
-            null, System.Globalization.DateTimeStyles.RoundtripKind
+            null, DateTimeStyles.RoundtripKind
         );
 
         var request = new Request {
