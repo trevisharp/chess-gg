@@ -4,5 +4,7 @@ namespace ChessGG.Application.Interfaces;
 
 public interface IAnalisysService
 {
-    Analisys GetByPlayer(string player);
+    Task<Analisys?> GetByPlayerAsync(string player);
+    Task CreateEmptyAsync(string player);
+    Task UpdateAsync(Analisys analisys);
 }

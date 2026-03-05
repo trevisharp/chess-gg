@@ -4,6 +4,6 @@ using Domain;
 
 public interface IRequestService
 {
-    Request GetById(string id);
-    Request Create(string player);
+    Task<Request?> GetByIdAsync(string id);
+    Task<Request?> CreateAsync(string player);
 }
