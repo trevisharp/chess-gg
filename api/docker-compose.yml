@@ -28,6 +28,7 @@ services:
     depends_on:
       - rabbitmq
     environment:
+      ENV: dev
       DYNAMODB_URL: localhost:8000
       RABBITMQ_URL: localhost:15672
       RabbitMQ__Host: rabbitmq
