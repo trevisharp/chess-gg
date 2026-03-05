@@ -67,4 +67,31 @@ public class DynamoDBRequestService(DynamoDBClient client) : IRequestService
 
         return request;
     }
+
+    public async Task UpdateAsync(Request req)
+    {
+        var request = new UpdateItemRequest {
+            TableName = "Analisys",
+            Key = new Dictionary<string, AttributeValue> {
+                { "Id", new AttributeValue { S = req.Id.ToString() } }
+            },
+            ExpressionAttributeNames = new Dictionary<string, string> {
+                { "#Player", "Player" },
+                { "#Creation", "Creation" },
+                { "#Status", "Status" },
+                { "#ProcessStatus", "ProcessStatus" }
+            },
+            ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+            {
+                { ":player", new AttributeValue { S = req.Player } },
+                { ":creation", new AttributeValue { S = req.Creation.ToString("o") } },
+                { ":status", new AttributeValue { S = req.Status.ToString() } },
+                { ":processstatus", new AttributeValue { N = req.ProcessStatus.ToString() } }
+            },
+            UpdateExpression =  "SET #Player = :player, #Creation = :creation, " + 
+                "#Status = :status, #ProcessStatus = :processstatus"
+        };
+
+        await client.Connection.UpdateItemAsync(request);
+    }
 }

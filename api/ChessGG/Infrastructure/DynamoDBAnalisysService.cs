@@ -90,6 +90,5 @@ public class DynamoDBAnalisysService(DynamoDBClient client) : IAnalisysService
         };
 
         await client.Connection.UpdateItemAsync(request);
-
     }
 }
