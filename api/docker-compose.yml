@@ -13,6 +13,13 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  dynamodb:
+    image: amazon/dynamodb-local
+    container_name: dynamodb_local
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -inMemory -sharedDb"
+
   api:
     build: .
     container_name: chess-api
