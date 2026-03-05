@@ -10,6 +10,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: chess
       RABBITMQ_DEFAULT_PASS: chess123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
   api:
     build: .
@@ -22,3 +24,6 @@ services:
       RabbitMQ__Host: rabbitmq
       RabbitMQ__User: chess
       RabbitMQ__Password: chess123
+
+volumes:
+  rabbitmq_data:
