@@ -5,14 +5,14 @@ namespace ChessGG.Infrastructure;
 using Domain;
 using Application.Interfaces;
 
-public class DynamoDBAnalisysService(DynamoDBClient client) : IAnalisysService
+public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
 {
-    public async Task<Analisys?> GetByPlayerAsync(string player)
+    public async Task<Analysis?> GetByPlayerAsync(string player)
     {
         await client.SetupAsync();
         
         var response = await client.Connection.QueryAsync(new QueryRequest {
-            TableName = "Analisys",
+            TableName = "Analysis",
             IndexName = "PlayerIndex",
             KeyConditionExpression = "Player = :player",
             ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
@@ -24,7 +24,7 @@ public class DynamoDBAnalisysService(DynamoDBClient client) : IAnalisysService
         if (item is null)
             return null;
         
-        var analisys = new Analisys {
+        var analisys = new Analysis {
             Id = Guid.Parse(item["Id"].S),
             Player = item["Player"].S,
             FinalsAbility = float.Parse(item["FinalsAbility"].N),
@@ -43,7 +43,7 @@ public class DynamoDBAnalisysService(DynamoDBClient client) : IAnalisysService
         await client.SetupAsync();
 
         var request = new PutItemRequest {
-            TableName = "Analisys",
+            TableName = "Analysis",
             Item = new Dictionary<string, AttributeValue>
             {
                 { "Player", new AttributeValue { S = player } },
@@ -59,10 +59,10 @@ public class DynamoDBAnalisysService(DynamoDBClient client) : IAnalisysService
         await client.Connection.PutItemAsync(request);
     }
 
-    public async Task UpdateAsync(Analisys analisys)
+    public async Task UpdateAsync(Analysis analisys)
     {
         var request = new UpdateItemRequest {
-            TableName = "Analisys",
+            TableName = "Analysis",
             Key = new Dictionary<string, AttributeValue> {
                 { "Id", new AttributeValue { S = analisys.Id.ToString() } }
             },

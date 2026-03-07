@@ -1,5 +1,3 @@
-using Amazon;
-
 using ChessGG.Application.Interfaces;
 using ChessGG.Application.UseCases.CreateRequest;
 using ChessGG.Application.UseCases.GenerateAnalisys;
@@ -7,6 +5,7 @@ using ChessGG.Application.UseCases.GetAnalisys;
 using ChessGG.Application.UseCases.GetRequest;
 using ChessGG.Endpoints;
 using ChessGG.Infrastructure;
+using ChessGG.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,12 +20,14 @@ builder.Services.AddScoped(provider => new DynamoDBClient(
         ?? throw new Exception("missing 'AWS_ACCESS_KEY_ID' env.")
 ));
 
+builder.Services.ConfigureMessaging(builder.Configuration);
+
 builder.Services.AddTransient<GetRequestUseCase>();
 builder.Services.AddTransient<CreateRequestUseCase>();
 builder.Services.AddTransient<GenerateAnalisysUseCase>();
 builder.Services.AddTransient<GetAnalisysUseCase>();
 
-builder.Services.AddTransient<IAnalisysService, DynamoDBAnalisysService>();
+builder.Services.AddTransient<IAnalysisService, DynamoDBAnalysisService>();
 builder.Services.AddTransient<IRequestService, DynamoDBRequestService>();
 
 var app = builder.Build();
@@ -35,6 +36,6 @@ app.UseHttpsRedirection();
 
 app.MapEndpoints();
 
-app.MapGet("/", () => "Running...");
+await app.UseMessaging();
 
 app.Run();

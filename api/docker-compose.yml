@@ -25,17 +25,15 @@ services:
     container_name: chess-api
     ports:
       - "5000:8080"
-    depends_on:
-      - rabbitmq
     environment:
       ENV: dev
       DYNAMODB_URL: http://dynamodb:8000
       AWS_ACCESS_KEY_ID: local
       AWS_SECRET_ACCESS_KEY: local
-      RABBITMQ_URL: localhost:15672
-      RabbitMQ__Host: rabbitmq
-      RabbitMQ__User: chess
-      RabbitMQ__Password: chess123
+      RABBITMQ_URL: http://localhost:15672
+      RabbitMQ_Host: rabbitmq
+      RabbitMQ_User: chess
+      RabbitMQ_Password: chess123
 
 volumes:
   rabbitmq_data:

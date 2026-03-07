@@ -2,7 +2,7 @@ using ChessGG.Application.Interfaces;
 
 namespace ChessGG.Application.UseCases.CreateRequest;
 
-public class CreateRequestUseCase(IRequestService service)
+public class CreateRequestUseCase(IRequestService service, IPublisher publisher)
 {
     public async Task<CreateRequestResponse> RunAsync(CreateRequestRequest request)
     {
@@ -13,7 +13,9 @@ public class CreateRequestUseCase(IRequestService service)
         if (playerRequest is null)
         {
             playerRequest = await service.CreateAsync(request.PlayerName);
-            // TODO: Send message
+            await publisher.Publish("chess.analysis.exchange", "analysis", new {
+                player = request.PlayerName
+            });
             return new (true, null, playerRequest.Id);
         }
         
@@ -21,7 +23,9 @@ public class CreateRequestUseCase(IRequestService service)
             return new (true, null, playerRequest.Id);
 
         playerRequest.Recreate();
-        // TODO: Send message
+        await publisher.Publish("chess.analysis.exchange", "analysis", new {
+            player = request.PlayerName
+        });
         await service.UpdateAsync(playerRequest);
 
         return new (true, null, playerRequest.Id);

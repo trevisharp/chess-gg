@@ -1,4 +1,3 @@
-using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime;
@@ -29,11 +28,11 @@ public class DynamoDBClient(
         needSetup = false;
 
         var tables = await client.ListTablesAsync();
-        if (!tables.TableNames.Contains("Analisys"))
+        if (!tables.TableNames.Contains("Analysis"))
         {
             await client.CreateTableAsync(new CreateTableRequest
             {
-                TableName = "Analisys",
+                TableName = "Analysis",
                 AttributeDefinitions = [
                     new() { AttributeName = "Id", AttributeType = ScalarAttributeType.S },
                     new() { AttributeName = "Player", AttributeType = ScalarAttributeType.S }

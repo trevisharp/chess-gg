@@ -1,6 +1,6 @@
 namespace ChessGG.Domain;
 
-public class Analisys
+public class Analysis
 {
     public required Guid Id { get; init; }
     public required string Player { get; init; }
