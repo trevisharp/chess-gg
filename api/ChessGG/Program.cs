@@ -4,6 +4,7 @@ using ChessGG.Application.UseCases.GenerateAnalisys;
 using ChessGG.Application.UseCases.GetAnalisys;
 using ChessGG.Application.UseCases.GetRequest;
 using ChessGG.Endpoints;
+using ChessGG.Endpoints.Consumers;
 using ChessGG.Infrastructure;
 using ChessGG.Infrastructure.Messaging;
 
@@ -29,6 +30,8 @@ builder.Services.AddTransient<GetAnalisysUseCase>();
 
 builder.Services.AddTransient<IAnalysisService, DynamoDBAnalysisService>();
 builder.Services.AddTransient<IRequestService, DynamoDBRequestService>();
+
+builder.Services.AddHostedService<AnalysisConsumer>();
 
 var app = builder.Build();
 
