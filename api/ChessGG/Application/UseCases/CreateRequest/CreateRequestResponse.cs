@@ -1,3 +1,7 @@
 namespace ChessGG.Application.UseCases.CreateRequest;
 
-public record CreateRequestResponse();
+public record CreateRequestResponse(
+    bool Success,
+    string? Reason,
+    Guid CreatedId
+);

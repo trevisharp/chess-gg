@@ -8,7 +8,7 @@ using Application.Interfaces;
 
 public class DynamoDBRequestService(DynamoDBClient client) : IRequestService
 {
-    public async Task<Request?> CreateAsync(string player)
+    public async Task<Request> CreateAsync(string player)
     {
         await client.SetupAsync();
 
@@ -37,15 +37,15 @@ public class DynamoDBRequestService(DynamoDBClient client) : IRequestService
         return obj;
     }
 
-    public async Task<Request?> GetByIdAsync(string id)
+    public async Task<Request?> GetByPlayerAsync(string player)
     {
         await client.SetupAsync();
         
         var response = await client.Connection.QueryAsync(new QueryRequest {
             TableName = "Request",
-            KeyConditionExpression = "Id = :id",
+            KeyConditionExpression = "Player = :player",
             ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
-                { ":id", new AttributeValue { S = id } }
+                { ":player", new AttributeValue { S = player } }
             }
         });
 
