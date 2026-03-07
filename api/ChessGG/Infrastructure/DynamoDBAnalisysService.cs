@@ -13,6 +13,7 @@ public class DynamoDBAnalisysService(DynamoDBClient client) : IAnalisysService
         
         var response = await client.Connection.QueryAsync(new QueryRequest {
             TableName = "Analisys",
+            IndexName = "PlayerIndex",
             KeyConditionExpression = "Player = :player",
             ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
                 { ":player", new AttributeValue { S = player } }

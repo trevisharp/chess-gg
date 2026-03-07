@@ -43,6 +43,7 @@ public class DynamoDBRequestService(DynamoDBClient client) : IRequestService
         
         var response = await client.Connection.QueryAsync(new QueryRequest {
             TableName = "Request",
+            IndexName = "PlayerIndex",
             KeyConditionExpression = "Player = :player",
             ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
                 { ":player", new AttributeValue { S = player } }
@@ -70,6 +71,8 @@ public class DynamoDBRequestService(DynamoDBClient client) : IRequestService
 
     public async Task UpdateAsync(Request req)
     {
+        await client.SetupAsync();
+
         var request = new UpdateItemRequest {
             TableName = "Analisys",
             Key = new Dictionary<string, AttributeValue> {

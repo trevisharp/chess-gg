@@ -11,7 +11,7 @@ public static class RequestEndpoints
     {
         route.MapGet("/request/{id}", (string id) =>
         {
-            
+            return Results.Ok();
         });
 
         route.MapPost("/request", async (

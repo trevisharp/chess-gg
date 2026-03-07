@@ -1,6 +1,10 @@
 using Amazon;
 
 using ChessGG.Application.Interfaces;
+using ChessGG.Application.UseCases.CreateRequest;
+using ChessGG.Application.UseCases.GenerateAnalisys;
+using ChessGG.Application.UseCases.GetAnalisys;
+using ChessGG.Application.UseCases.GetRequest;
 using ChessGG.Endpoints;
 using ChessGG.Infrastructure;
 
@@ -9,9 +13,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped(provider => new DynamoDBClient(
     serviceUrl: builder.Configuration["DYNAMODB_URL"]
         ?? throw new Exception("missing 'DYNAMODB_URL' env."),
-    region: RegionEndpoint.SAEast1,
-    deploy: builder.Configuration["ENV"] == "prod"
+    region: "sa-east-1",
+    deploy: builder.Configuration["ENV"] == "prod",
+    accessKey: builder.Configuration["AWS_SECRET_ACCESS_KEY"]
+        ?? throw new Exception("missing 'AWS_SECRET_ACCESS_KEY' env."),
+    secretKey: builder.Configuration["AWS_ACCESS_KEY_ID"]
+        ?? throw new Exception("missing 'AWS_ACCESS_KEY_ID' env.")
 ));
+
+builder.Services.AddTransient<GetRequestUseCase>();
+builder.Services.AddTransient<CreateRequestUseCase>();
+builder.Services.AddTransient<GenerateAnalisysUseCase>();
+builder.Services.AddTransient<GetAnalisysUseCase>();
 
 builder.Services.AddTransient<IAnalisysService, DynamoDBAnalisysService>();
 builder.Services.AddTransient<IRequestService, DynamoDBRequestService>();
@@ -21,5 +34,7 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.MapEndpoints();
+
+app.MapGet("/", () => "Running...");
 
 app.Run();

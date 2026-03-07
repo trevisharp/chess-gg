@@ -29,7 +29,9 @@ services:
       - rabbitmq
     environment:
       ENV: dev
-      DYNAMODB_URL: localhost:8000
+      DYNAMODB_URL: http://dynamodb:8000
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
       RABBITMQ_URL: localhost:15672
       RabbitMQ__Host: rabbitmq
       RabbitMQ__User: chess

@@ -1,47 +1,61 @@
 using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using Amazon.Runtime;
 
 namespace ChessGG.Infrastructure;
 
-public class DynamoDBClient(string serviceUrl, RegionEndpoint region, bool deploy)
+public class DynamoDBClient(
+    string serviceUrl, string region,
+    string accessKey, string secretKey,
+    bool deploy
+    )
 {
     bool needSetup = !deploy;
-    readonly AmazonDynamoDBClient client = new (new AmazonDynamoDBConfig {
-        ServiceURL = serviceUrl,
-        RegionEndpoint = region
-    });
+    readonly AmazonDynamoDBClient client = new (
+        new BasicAWSCredentials(accessKey, secretKey),
+        new AmazonDynamoDBConfig {
+            ServiceURL = serviceUrl,
+            AuthenticationRegion = region
+        }
+    );
     
     public AmazonDynamoDBClient Connection => client;
 
     public async Task SetupAsync()
     {
-        if (needSetup)
+        if (!needSetup)
             return;
         needSetup = false;
-        
+
         var tables = await client.ListTablesAsync();
         if (!tables.TableNames.Contains("Analisys"))
         {
             await client.CreateTableAsync(new CreateTableRequest
             {
                 TableName = "Analisys",
+                AttributeDefinitions = [
+                    new() { AttributeName = "Id", AttributeType = ScalarAttributeType.S },
+                    new() { AttributeName = "Player", AttributeType = ScalarAttributeType.S }
+                ],
                 KeySchema = [
                     new KeySchemaElement { AttributeName = "Id", KeyType = KeyType.HASH }
-                ],
-                AttributeDefinitions = [
-                    new() { AttributeName = "Player", AttributeType = ScalarAttributeType.S },
-                    new() { AttributeName = "RatingId", AttributeType = ScalarAttributeType.S },
-                    new() { AttributeName = "OpeningTeory", AttributeType = ScalarAttributeType.N },
-                    new() { AttributeName = "ThreatAvaliation", AttributeType = ScalarAttributeType.N },
-                    new() { AttributeName = "TaticalAttention", AttributeType = ScalarAttributeType.N },
-                    new() { AttributeName = "TimeManagement", AttributeType = ScalarAttributeType.N },
-                    new() { AttributeName = "FinalsAbility", AttributeType = ScalarAttributeType.N }
                 ],
                 ProvisionedThroughput = new ProvisionedThroughput {
                     ReadCapacityUnits = 5,
                     WriteCapacityUnits = 5
-                }
+                },
+                GlobalSecondaryIndexes = [
+                    new GlobalSecondaryIndex
+                    {
+                        IndexName = "PlayerIndex",
+                        KeySchema = [
+                            new KeySchemaElement { AttributeName = "Player", KeyType = KeyType.HASH }
+                        ],
+                        Projection = new Projection { ProjectionType = ProjectionType.ALL },
+                        ProvisionedThroughput = new ProvisionedThroughput { ReadCapacityUnits = 5, WriteCapacityUnits = 5 }
+                    }
+                ]
             });
         }
         
@@ -50,19 +64,28 @@ public class DynamoDBClient(string serviceUrl, RegionEndpoint region, bool deplo
             await client.CreateTableAsync(new CreateTableRequest
             {
                 TableName = "Request",
+                AttributeDefinitions = [
+                    new() { AttributeName = "Id", AttributeType = ScalarAttributeType.S },
+                    new() { AttributeName = "Player", AttributeType = ScalarAttributeType.S }
+                ],
                 KeySchema = [
                     new KeySchemaElement { AttributeName = "Id", KeyType = KeyType.HASH }
-                ],
-                AttributeDefinitions = [
-                    new() { AttributeName = "Player", AttributeType = ScalarAttributeType.S },
-                    new() { AttributeName = "Creation", AttributeType = ScalarAttributeType.S },
-                    new() { AttributeName = "Status", AttributeType = ScalarAttributeType.S },
-                    new() { AttributeName = "ProcessStatus", AttributeType = ScalarAttributeType.N }
                 ],
                 ProvisionedThroughput = new ProvisionedThroughput {
                     ReadCapacityUnits = 5,
                     WriteCapacityUnits = 5
-                }
+                },
+                GlobalSecondaryIndexes = [
+                    new GlobalSecondaryIndex
+                    {
+                        IndexName = "PlayerIndex",
+                        KeySchema = [
+                            new KeySchemaElement { AttributeName = "Player", KeyType = KeyType.HASH }
+                        ],
+                        Projection = new Projection { ProjectionType = ProjectionType.ALL },
+                        ProvisionedThroughput = new ProvisionedThroughput { ReadCapacityUnits = 5, WriteCapacityUnits = 5 }
+                    }
+                ]
             });
         }
     }
