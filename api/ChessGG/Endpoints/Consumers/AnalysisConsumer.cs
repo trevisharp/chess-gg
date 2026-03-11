@@ -7,11 +7,14 @@ using RabbitMQ.Client.Events;
 namespace ChessGG.Endpoints.Consumers;
 
 using Application.UseCases.GenerateAnalisys;
+using Application.Interfaces;
 using Infrastructure.Messaging;
+using System.Runtime.Intrinsics.Arm;
 
 public class AnalysisConsumer(
     ConnectionManager manager,
     GenerateAnalisysUseCase useCase,
+    IPublisher publisher,
     ILogger<AnalysisConsumer> logger) : BackgroundService
 {
     IChannel? channel;
@@ -37,27 +40,45 @@ public class AnalysisConsumer(
 
             try
             {
-                var json = JsonSerializer
-                    .Deserialize<GenerateAnalisysRequest>(message);
-                if (json is null)
-                    throw new Exception("vishhh");
-                
+                var json = JsonSerializer.Deserialize<GenerateAnalisysRequest>(message) 
+                    ?? throw new Exception("Invalid message format.");
                 await useCase.RunAsync(json);
-
-                await channel.BasicAckAsync(
-                    deliveryTag: ea.DeliveryTag,
-                    multiple: false
-                );
             }
             catch (Exception ex)
             {
                 if (logger.IsEnabled(LogLevel.Error))
-                    logger.LogError("Error on analisys processing {}. Error: {}", message, ex);
-                
-                await channel.BasicNackAsync(
+                    logger.LogError("Error on analisys processing {message}. Error: {ex}", message, ex);
+
+                int deaths = 0;
+                var headers = ea.BasicProperties.Headers;
+                if (headers != null && headers.TryGetValue("x-death", out var value))
+                {
+                    var deathList = (List<object>)value!;
+                    var deathEntry = (Dictionary<string, object>)deathList[0];
+                    deaths = Convert.ToInt32(deathEntry["count"]);
+                }
+
+                var props = new BasicProperties {
+                    Headers = ea.BasicProperties.Headers,
+                    CorrelationId = ea.BasicProperties.CorrelationId,
+                    MessageId = ea.BasicProperties.MessageId,
+                    ContentType = ea.BasicProperties.ContentType,
+                    ContentEncoding = ea.BasicProperties.ContentEncoding,
+                    DeliveryMode = ea.BasicProperties.DeliveryMode
+                };
+
+                if (deaths == 0)
+                    await publisher.Publish("chess.analysis.exchange", "retry1", message, props);
+                else if (deaths == 1)
+                    await publisher.Publish("chess.analysis.exchange", "retry2", message, props);
+                else
+                    await publisher.Publish("chess.analysis.exchange", "dlq", message, props);
+            }
+            finally
+            {
+                await channel.BasicAckAsync(
                     deliveryTag: ea.DeliveryTag,
-                    multiple: false,
-                    requeue: true
+                    multiple: false
                 );
             }
         };
@@ -75,7 +96,8 @@ public class AnalysisConsumer(
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        channel?.CloseAsync(cancellationToken);
+        if (channel is not null)
+            await channel.CloseAsync(cancellationToken);
         await base.StopAsync(cancellationToken);
     }
 }

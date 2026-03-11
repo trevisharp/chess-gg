@@ -9,14 +9,14 @@ public class Publisher(ConnectionManager manager) : IAsyncDisposable, IPublisher
 {
     IChannel? channel = null;
 
-    public async Task Publish<T>(string exchange, string routingKey, T message)
+    public async Task Publish<T>(string exchange, string routingKey, T message, BasicProperties? props = null)
     {
         var connection = await manager.GetAsync();
         channel ??= await connection.CreateChannelAsync();
 
         var json = JsonSerializer.Serialize(message);
         var body = Encoding.UTF8.GetBytes(json);
-        var props = new BasicProperties {
+        props ??= new BasicProperties {
             Persistent = true,
             MessageId = Guid.NewGuid().ToString()
         };
