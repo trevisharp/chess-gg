@@ -1,3 +1,3 @@
 namespace ChessGG.Application.UseCases.GetRequest;
 
-public record GetRequestRequest();
+public record GetRequestRequest(string Player);

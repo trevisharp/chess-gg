@@ -1,6 +1,6 @@
-using ChessGG.Application.Interfaces;
-
 namespace ChessGG.Application.UseCases.CreateRequest;
+
+using Application.Interfaces;
 
 public class CreateRequestUseCase(IRequestService service, IPublisher publisher)
 {
@@ -23,10 +23,10 @@ public class CreateRequestUseCase(IRequestService service, IPublisher publisher)
             return new (true, null, playerRequest.Id);
 
         playerRequest.Recreate();
+        await service.UpdateAsync(playerRequest);
         await publisher.Publish("chess.analysis.exchange", "analysis", new {
             player = request.PlayerName
         });
-        await service.UpdateAsync(playerRequest);
 
         return new (true, null, playerRequest.Id);
     }

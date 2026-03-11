@@ -1,3 +1,5 @@
 namespace ChessGG.Application.UseCases.GetRequest;
 
-public record GetRequestResponse();
+using Domain;
+
+public record GetRequestResponse(Request? Request);
