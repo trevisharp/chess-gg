@@ -70,8 +70,8 @@ public static class MessagingConfiguration
             autoDelete: false,
             arguments: new Dictionary<string, object?> {
                 { "x-message-ttl", 5_000 },
-                { "x-dead-letter-exchange", "chess.ex.analysis" },
-                { "x-dead-letter-routing-key", "analysis" }
+                { "x-dead-letter-exchange", AnalisysExchange },
+                { "x-dead-letter-routing-key", AnalisysRoutingKey }
             }
         );
 
@@ -82,8 +82,8 @@ public static class MessagingConfiguration
             autoDelete: false,
             arguments: new Dictionary<string, object?> {
                 { "x-message-ttl", 30_000 },
-                { "x-dead-letter-exchange", "chess.ex.analysis" },
-                { "x-dead-letter-routing-key", "analysis" }
+                { "x-dead-letter-exchange", AnalisysExchange },
+                { "x-dead-letter-routing-key", AnalisysRoutingKey }
             }
         );
 

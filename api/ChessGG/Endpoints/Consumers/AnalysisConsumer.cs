@@ -9,7 +9,6 @@ namespace ChessGG.Endpoints.Consumers;
 using Application.UseCases.GenerateAnalisys;
 using Application.Interfaces;
 using Infrastructure.Messaging;
-using System.Runtime.Intrinsics.Arm;
 
 public class AnalysisConsumer(
     ConnectionManager manager,
@@ -37,11 +36,12 @@ public class AnalysisConsumer(
         {
             var body = ea.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
-
+            var json = JsonSerializer.Deserialize<GenerateAnalisysRequest>(message);
             try
             {
-                var json = JsonSerializer.Deserialize<GenerateAnalisysRequest>(message) 
-                    ?? throw new Exception("Invalid message format.");
+                if (json is null)
+                    throw new Exception("Invalid message format.");
+                
                 await useCase.RunAsync(json);
             }
             catch (Exception ex)
@@ -67,12 +67,11 @@ public class AnalysisConsumer(
                     DeliveryMode = ea.BasicProperties.DeliveryMode
                 };
 
-                if (deaths == 0)
-                    await publisher.Publish("chess.analysis.exchange", "retry1", message, props);
-                else if (deaths == 1)
-                    await publisher.Publish("chess.analysis.exchange", "retry2", message, props);
-                else
-                    await publisher.Publish("chess.analysis.exchange", "dlq", message, props);
+                if (deaths == 0 && json is not null)
+                    await publisher.Publish("chess.analysis.exchange", "retry1", json, props);
+                else if (deaths == 1 && json is not null)
+                    await publisher.Publish("chess.analysis.exchange", "retry2", json, props);
+                else await publisher.Publish("chess.analysis.exchange", "dlq", json, props);
             }
             finally
             {
