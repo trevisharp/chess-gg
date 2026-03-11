@@ -1,16 +1,24 @@
 using System.Text;
+using System.Text.Json;
 
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace ChessGG.Endpoints.Consumers;
 
-public class AnalysisConsumer(IConnection connection) : BackgroundService
+using Application.UseCases.GenerateAnalisys;
+using Infrastructure.Messaging;
+
+public class AnalysisConsumer(
+    ConnectionManager manager,
+    GenerateAnalisysUseCase useCase,
+    ILogger<AnalysisConsumer> logger) : BackgroundService
 {
     IChannel? channel;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var connection = await manager.GetAsync();
         channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
 
         await channel.QueueDeclareAsync(
@@ -24,12 +32,17 @@ public class AnalysisConsumer(IConnection connection) : BackgroundService
         var consumer = new AsyncEventingBasicConsumer(channel);
         consumer.ReceivedAsync += async (model, ea) =>
         {
+            var body = ea.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+
             try
             {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
+                var json = JsonSerializer
+                    .Deserialize<GenerateAnalisysRequest>(message);
+                if (json is null)
+                    throw new Exception("vishhh");
                 
-                Console.WriteLine($"[Consumer] Received: {message}");
+                await useCase.RunAsync(json);
 
                 await channel.BasicAckAsync(
                     deliveryTag: ea.DeliveryTag,
@@ -38,7 +51,8 @@ public class AnalysisConsumer(IConnection connection) : BackgroundService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing message: {ex}");
+                if (logger.IsEnabled(LogLevel.Error))
+                    logger.LogError("Error on analisys processing {}. Error: {}", message, ex);
                 
                 await channel.BasicNackAsync(
                     deliveryTag: ea.DeliveryTag,
