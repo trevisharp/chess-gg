@@ -38,7 +38,7 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
         return analisys;
     }
     
-    public async Task CreateEmptyAsync(string player)
+    public async Task<Analysis> CreateEmptyAsync(string player)
     {
         await client.SetupAsync();
 
@@ -56,7 +56,20 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
             }
         };
 
-        await client.Connection.PutItemAsync(request);
+        var result = await client.Connection.PutItemAsync(request);
+        if ((int)result.HttpStatusCode is < 200 or >= 300)
+            throw new Exception("Failed to create analisys.");
+
+        return new Analysis {
+            Id = Guid.Parse(result.Attributes["Id"].S),
+            FinalsAbility = 0,
+            OpeningTeory = 0,
+            TaticalAttention = 0,
+            ThreatAvaliation = 0,
+            TimeManagement = 0,
+            RequestId = null,
+            Player = player,
+        };
     }
 
     public async Task UpdateAsync(Analysis analisys)

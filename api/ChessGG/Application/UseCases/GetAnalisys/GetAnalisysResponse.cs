@@ -1,3 +1,5 @@
+using ChessGG.Domain;
+
 namespace ChessGG.Application.UseCases.GetAnalisys;
 
-public record GetAnalisysResponse();
+public record GetAnalisysResponse(Analysis Analysis);

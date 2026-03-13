@@ -1,7 +1,8 @@
-using ChessGG.Application.Interfaces;
 using RabbitMQ.Client;
 
 namespace ChessGG.Infrastructure.Messaging;
+
+using Application.Interfaces;
 
 public static class MessagingConfiguration
 {
