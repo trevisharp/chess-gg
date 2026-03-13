@@ -12,9 +12,9 @@ public class GetAnalisysUseCase(IAnalysisService service, IPlayerService playerS
         
         var analysis = await service.GetByPlayerAsync(request.Player);
         if (analysis is not null)
-            return new(analysis, null);
+            return new(analysis, player);
         
         var empty = await service.CreateEmptyAsync(request.Player);
-        return new(empty, null);
+        return new(empty, player);
     }
 }

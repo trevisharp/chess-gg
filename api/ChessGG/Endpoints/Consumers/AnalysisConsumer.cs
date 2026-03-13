@@ -36,7 +36,9 @@ public class AnalysisConsumer(
         {
             var body = ea.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
-            var json = JsonSerializer.Deserialize<GenerateAnalisysRequest>(message);
+            var json = JsonSerializer.Deserialize<GenerateAnalisysRequest>(message,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }
+            );
             try
             {
                 if (json is null)

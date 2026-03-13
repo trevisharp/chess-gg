@@ -32,7 +32,7 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
             TaticalAttention = float.Parse(item["TaticalAttention"].N),
             ThreatAvaliation = float.Parse(item["ThreatAvaliation"].N),
             TimeManagement = float.Parse(item["TimeManagement"].N),
-            RequestId = item["RequestId"].S
+            RequestId = item.TryGetValue("RequestId", out var value) ? value.S : null
         };
 
         return analisys;
@@ -42,12 +42,13 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
     {
         await client.SetupAsync();
 
+        var id = Guid.NewGuid();
         var request = new PutItemRequest {
             TableName = "Analysis",
             Item = new Dictionary<string, AttributeValue>
             {
+                { "Id", new AttributeValue { S = id.ToString() } },
                 { "Player", new AttributeValue { S = player } },
-                { "RequestId", new AttributeValue { S = null } },
                 { "FinalsAbility", new AttributeValue { N = "0" } },
                 { "OpeningTeory", new AttributeValue { N = "0" } },
                 { "TaticalAttention", new AttributeValue { N = "0" } },
@@ -61,7 +62,7 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
             throw new Exception("Failed to create analisys.");
 
         return new Analysis {
-            Id = Guid.Parse(result.Attributes["Id"].S),
+            Id = id,
             FinalsAbility = 0,
             OpeningTheory = 0,
             TaticalAttention = 0,
@@ -74,6 +75,8 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
 
     public async Task UpdateAsync(Analysis analisys)
     {
+        await client.SetupAsync();
+
         var request = new UpdateItemRequest {
             TableName = "Analysis",
             Key = new Dictionary<string, AttributeValue> {

@@ -74,7 +74,7 @@ public class DynamoDBRequestService(DynamoDBClient client) : IRequestService
         await client.SetupAsync();
 
         var request = new UpdateItemRequest {
-            TableName = "Analisys",
+            TableName = "Request",
             Key = new Dictionary<string, AttributeValue> {
                 { "Id", new AttributeValue { S = req.Id.ToString() } }
             },
