@@ -28,7 +28,7 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
             Id = Guid.Parse(item["Id"].S),
             Player = item["Player"].S,
             FinalsAbility = float.Parse(item["FinalsAbility"].N),
-            OpeningTeory = float.Parse(item["OpeningTeory"].N),
+            OpeningTheory = float.Parse(item["OpeningTeory"].N),
             TaticalAttention = float.Parse(item["TaticalAttention"].N),
             ThreatAvaliation = float.Parse(item["ThreatAvaliation"].N),
             TimeManagement = float.Parse(item["TimeManagement"].N),
@@ -63,7 +63,7 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
         return new Analysis {
             Id = Guid.Parse(result.Attributes["Id"].S),
             FinalsAbility = 0,
-            OpeningTeory = 0,
+            OpeningTheory = 0,
             TaticalAttention = 0,
             ThreatAvaliation = 0,
             TimeManagement = 0,
@@ -92,7 +92,7 @@ public class DynamoDBAnalysisService(DynamoDBClient client) : IAnalysisService
             {
                 { ":player", new AttributeValue { S = analisys.Player } },
                 { ":requestid", new AttributeValue { S = analisys.RequestId } },
-                { ":opening", new AttributeValue { N = analisys.OpeningTeory.ToString() } },
+                { ":opening", new AttributeValue { N = analisys.OpeningTheory.ToString() } },
                 { ":threat", new AttributeValue { N = analisys.ThreatAvaliation.ToString() } },
                 { ":tactical", new AttributeValue { N = analisys.TaticalAttention.ToString() } },
                 { ":time", new AttributeValue { N = analisys.TimeManagement.ToString() } },
