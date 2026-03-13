@@ -28,6 +28,9 @@ builder.Services.AddTransient<CreateRequestUseCase>();
 builder.Services.AddTransient<GenerateAnalisysUseCase>();
 builder.Services.AddTransient<GetAnalisysUseCase>();
 
+builder.Services.AddTransient<ChessService>();
+builder.Services.AddTransient<IPlayerService, ChessPlayerService>();
+
 builder.Services.AddTransient<IAnalysisService, DynamoDBAnalysisService>();
 builder.Services.AddTransient<IRequestService, DynamoDBRequestService>();
 

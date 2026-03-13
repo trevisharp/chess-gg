@@ -4,7 +4,6 @@ public enum RequestStatus
 {
     Waiting,
     Completed,
-    WaitingRetry,
     InProcess,
     Failed
 }
