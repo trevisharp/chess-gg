@@ -17,4 +17,6 @@ COPY --from=build /out .
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
 
+HEALTHCHECK --interval=30s --timeout=5s CMD curl -f http://localhost:8080/health || exit 1
+
 ENTRYPOINT ["dotnet", "ChessGG.dll"]

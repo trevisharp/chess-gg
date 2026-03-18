@@ -4,20 +4,31 @@ using Amazon.Runtime;
 
 namespace ChessGG.Infrastructure;
 
-public class DynamoDBClient(
-    string serviceUrl, string region,
-    string accessKey, string secretKey,
-    bool deploy
-    )
+public class DynamoDBClient
 {
-    bool needSetup = !deploy;
-    readonly AmazonDynamoDBClient client = new (
-        new BasicAWSCredentials(accessKey, secretKey),
-        new AmazonDynamoDBConfig {
-            ServiceURL = serviceUrl,
-            AuthenticationRegion = region
-        }
-    );
+    public DynamoDBClient(
+        string serviceUrl, string region,
+        string? accessKey, string? secretKey
+    )
+    {
+        needSetup = true;
+        client = new (
+            new BasicAWSCredentials(accessKey, secretKey),
+            new AmazonDynamoDBConfig {
+                ServiceURL = serviceUrl,
+                AuthenticationRegion = region
+            }
+        );
+    }
+
+    public DynamoDBClient()
+    {
+        needSetup = false;
+        client = new AmazonDynamoDBClient(Amazon.RegionEndpoint.SAEast1); 
+    }
+
+    bool needSetup;
+    readonly AmazonDynamoDBClient client;
     
     public AmazonDynamoDBClient Connection => client;
 
