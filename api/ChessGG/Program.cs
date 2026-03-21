@@ -25,7 +25,7 @@ builder.Services.AddScoped(provider =>
         )
 );
 
-// builder.Services.ConfigureMessaging(builder.Configuration);
+builder.Services.ConfigureMessaging(builder.Configuration);
 
 builder.Services.AddTransient<GetRequestUseCase>();
 builder.Services.AddTransient<CreateRequestUseCase>();
@@ -46,6 +46,6 @@ app.UseHttpsRedirection();
 
 app.MapEndpoints();
 
-// await app.UseMessaging();
+await app.UseMessaging();
 
 app.Run();

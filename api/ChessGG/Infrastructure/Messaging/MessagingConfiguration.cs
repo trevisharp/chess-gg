@@ -24,17 +24,12 @@ public static class MessagingConfiguration
     public static IServiceCollection ConfigureMessaging(this IServiceCollection services, IConfiguration configs)
     {
         services.AddSingleton(prov => new ConnectionFactory {
-            HostName = configs["RabbitMQ_Host"] ?? "http://localhost"
+            HostName = configs["RabbitMQ_Host"]
                 ?? throw new Exception("missing 'RabbitMQ_Host' env."),
-            Port = int.Parse(configs["RABBITMQ_PORT"] ?? "15672"),
             UserName = configs["RabbitMQ_User"]
                 ?? throw new Exception("missing 'RabbitMQ_User' env."),
             Password = configs["RabbitMQ_Password"]
-                ?? throw new Exception("missing 'RabbitMQ_Password' env."),
-            Ssl = new SslOption {
-                Enabled = true,
-                ServerName = configs["RabbitMQ_Host"] ?? "http://localhost"
-            }
+                ?? throw new Exception("missing 'RabbitMQ_Password' env.")
         });
         services.AddSingleton<ConnectionManager>();
         services.AddScoped<IPublisher, Publisher>();

@@ -30,7 +30,6 @@ services:
       DYNAMODB_URL: http://dynamodb:8000
       AWS_ACCESS_KEY_ID: local
       AWS_SECRET_ACCESS_KEY: local
-      RABBITMQ_URL: http://localhost:15672
       RabbitMQ_Host: rabbitmq
       RabbitMQ_User: chess
       RabbitMQ_Password: chess123
