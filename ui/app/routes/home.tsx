@@ -1,4 +1,6 @@
+import HomePage from "~/components/HomePage/HomePage";
 import type { Route } from "./+types/home";
+import MainLayout from "~/layouts/MainLayout";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,7 +10,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return (<div>
-    Empty Home Page
-  </div>)
+  return <MainLayout>
+    <HomePage/>
+  </MainLayout>
 }
