@@ -1,0 +1,1 @@
+export const API_URL = "https://chessggloadbalancer-437502797.sa-east-1.elb.amazonaws.com"

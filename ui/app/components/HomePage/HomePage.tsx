@@ -1,10 +1,13 @@
+import { useNavigate } from "react-router";
 import SearchBar from "../SearchBar/SearchBar";
 
 export default function HomePage() {
 
+    const navigate = useNavigate()
+
     const handleSearch = async (search: string) => {
-        
-        return false
+        navigate("/analysis/" + search)
+        return true
     }
 
     return (

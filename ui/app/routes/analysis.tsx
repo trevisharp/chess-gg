@@ -16,6 +16,6 @@ export default function Component({
     loaderData
 }: Route.ComponentProps) {
   return <MainLayout>
-    <AnalysisPage />
+    <AnalysisPage player={loaderData.player} />
   </MainLayout>
 }
